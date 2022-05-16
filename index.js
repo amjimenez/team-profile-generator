@@ -10,6 +10,11 @@ const Intern = require("./lib/Intern");
 const AppHtml = require("./src/templates/app");
 const EmployeeHtml = require("./src/templates/employee");
 
+let employees = [];
+let employeeIds = [];
+let employeeEmails = [];
+let githubUsernames = [];
+
 // Employee questions common to all roles
 const employeeQuestions = [
     {
@@ -17,22 +22,58 @@ const employeeQuestions = [
         name: 'name',
         message: "Enter {{ employee }}'s name:",
         default: '',
+        validate: function(input) {
+            if (input == null || input.trim() == '') {
+                return 'Employee name is required';
+            }
+
+            return true;
+        }
     },
     {
         type: 'input',
         name: 'id',
         message: "Enter {{ employee }}'s employee ID:",
         default: '',
+        validate: function(input) {
+            let num = Number.parseInt(input);
+
+            if (employeeIds.includes(num)) {
+                return 'Employee ID is already in use';
+            }
+
+            if (Number.isNaN(num)) {
+                return 'Employee ID must be a number';
+            }
+
+            employeeIds.push(num);
+
+            return true;
+        }
     },
     {
         type: 'input',
         name: 'email',
         message: "Enter {{ employee }}'s email address:",
         default: '',
+        validate: function(input) {
+            let email = input.toLowerCase();
+
+            if (employeeEmails.includes(email)) {
+                return 'Employee email is already in use';
+            }
+
+            const regex = new RegExp(/^.+\@.+$/);
+            if (!regex.test(input)) {
+                return 'Employee email is invalid or missing';
+            }
+
+            employeeEmails.push(email);
+
+            return true;
+        }
     }
 ];
-
-let employees = [];
 
 function generateHtml() {
     let html = AppHtml;
@@ -72,6 +113,13 @@ function addEmployee(role) {
             name: 'officeNumber',
             message: "Enter Manager's office number:",
             default: '',
+            validate: function(input) {
+                if (input == null || input.trim() == '') {
+                    return 'Manager office number is required';
+                }
+    
+                return true;
+            }
         });
     }
 
@@ -81,6 +129,21 @@ function addEmployee(role) {
             name: 'github',
             message: "Enter Engineer's GitHub username:",
             default: '',
+            validate: function(input) {
+                let username = input.toLowerCase();
+
+                if (githubUsernames.includes(username)) {
+                    return 'Employee GitHub username is already in use';
+                }
+
+                if (username.trim() == '' || username == null) {
+                    return 'Engineer GitHuber usenname is required';
+                }
+
+                githubUsernames.push(username);
+    
+                return true;
+            }
         })
     }
 
@@ -90,6 +153,13 @@ function addEmployee(role) {
             name: 'school',
             message: "Enter Intern's school:",
             default: '',
+            validate: function(input) {
+                if (input == null || input.trim() == '') {
+                    return 'Intern school is required';
+                }
+    
+                return true;
+            }
         })
     }
 
